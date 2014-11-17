@@ -1,0 +1,26 @@
+<package>
+  <description brief="Gaussian Process regression (C++ library)">
+
+This package provides an implementation of Gaussian Process regression. It provides an easy interface to build a GP from input and output data. The GP can then estimate the output at any given input location. Further, a gradient-descent based optimization of the hyperparameter is available.
+
+This library was implemented by Christian Plagemann, Jürgen Hess, Axel Rottmann and Jürgen Sturm at the Autonomous Intelligent Systems Lab. It contains code from Gunter Winkler and Konstantin Kutzkow which implements a LU factorization for boost.
+
+More details on Gaussian Process regression can be found in the open-source book "Gaussian Processes for Machine Learning", written by Carl Edward Rasmussen and Chris Williams, the MIT Press, 2006, available from http://www.gaussianprocess.org/gpml/chapters.
+
+  </description>
+  <author>Maintained by Juergen Sturm</author>
+  <license>LGPL</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/gaussian_process</url>
+
+  <rosdep name="libgsl"/>
+  <rosdep name="atlas"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lgaussian_process -lgsl  -lgslcblas -Wl,-rpath,${prefix}/lib"/>
+  </export>
+
+
+</package>
+
+

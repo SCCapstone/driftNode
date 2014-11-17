@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/viki/catkin_ws/src/gaussian_process/build/devel/setup.sh
