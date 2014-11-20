@@ -10,7 +10,7 @@ from sensor_msgs.msg import Imu
 #***********End 'O Imports************#
 
 #**********Global Variables***********#
-freq = 10	#sensor polling frequency
+freq = 10	#ros looping frequency
 seq = 0	#will keep track of the message sequence number
 #*******End 'O Global Variables*******#
 
