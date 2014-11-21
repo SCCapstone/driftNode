@@ -1,0 +1,62 @@
+- Raspicam							(https://github.com/fpasteau/raspicam_node)
+	- compressed_image_transport				(https://github.com/ros-perception/image_transport_plugins)
+		- cv_bridge 					(https://github.com/ros-perception/vision_opencv)
+			sensor_msgs				(https://github.com/ros/common_msgs)
+		- dynamic_reconfigure 				(https://github.com/ros/dynamic_reconfigure)
+			message_generation 			(https://github.com/ros/message_generation)
+		- image_transport 				(https://github.com/ros-perception/image_common)
+			- message_filters			(https://github.com/ros/ros_comm)
+			- pluginlib				(https://github.com/ros/pluginlib)
+				- class_loader			(https://github.com/ros/class_loader)
+				- cmake_modules			(https://github.com/ros/cmake_modules)
+			- sensor_msgs				(https://github.com/ros/common_msgs)
+		- tf						(https://github.com/ros/geometry)
+			- angles				(https://github.com/ros/angles)
+			- geometry_msgs				(https://github.com/ros/common_msgs)
+			- message_filters			(https://github.com/ros/ros_comm)
+			- message_generation 			(https://github.com/ros/message_generation)
+			- sensor_msgs				(https://github.com/ros/common_msgs)
+			- tf2_ros				(https://github.com/ros/geometry_experimental)
+				- actionlib			(https://github.com/ros/actionlib)
+					- actionlib_msgs	(https://github.com/ros/common_msgs)
+					- message_generation	(https://github.com/ros/message_generation)
+				- actionlib_msgs		(https://github.com/ros/common_msgs)
+				- geometry_msgs			(https://github.com/ros/common_msgs)
+				- message_filters		(https://github.com/ros/ros_comm)
+				- tf2				(https://github.com/ros/geometry_experimental)
+					- geometry_msgs		(https://github.com/ros/common_msgs)
+					- tf2_msgs		(https://github.com/ros/geometry_experimental)
+				- tf2_msgs			(https://github.com/ros/geometry_experimental)
+					- message_generation	(https://github.com/ros/message_generation)
+					- geometry_msgs		(https://github.com/ros/common_msgs)
+					- actionlib_msgs	(https://github.com/ros/common_msgs)
+				- tf2_py			(https://github.com/ros/geometry_experimental)
+					- tf2			(https://github.com/ros/geometry_experimental)
+
+	- camera_info_manager
+		- camera_calibration_parsers
+			- sensor_msgs		(https://github.com/ros/common_msgs)
+			- yaml.cpp		(https://code.google.com/p/yaml-cpp/)
+		- image_transport
+			- message_filters	(https://github.com/ros/ros_comm)	
+			- pluginlib		(https://github.com/ros/pluginlib)
+			- sensor_msgs		(https://github.com/ros/common_msgs)
+		- sensor_msgs			(https://github.com/ros/common_msgs)
+
+All Links (no duplicates):
+https://github.com/fpasteau/raspicam_node
+https://github.com/ros-perception/image_transport_plugins
+https://github.com/ros-perception/vision_opencv
+https://github.com/ros/common_msgs
+https://github.com/ros/dynamic_reconfigure
+https://github.com/ros/message_generation
+https://github.com/ros-perception/image_common
+https://github.com/ros/ros_comm
+https://github.com/ros/pluginlib
+https://github.com/ros/class_loader
+https://github.com/ros/cmake_modules
+https://github.com/ros/geometry
+https://github.com/ros/angles
+https://github.com/ros/geometry_experimental
+https://github.com/ros/actionlib
+https://code.google.com/p/yaml-cpp/
