@@ -6,7 +6,8 @@ from sensor_msgs.msg import NavSatFix
 from gps import gps
 
 def callback(data):
-    rospy.loginfo(rospy.get_caller_id()+" I heard [lat: %f long: %f alt: %f]", data.latitude, data.longitude, data.altitude)
+    rospy.loginfo(rospy.get_caller_id()+" I heard [lat: %f long: %f alt: %f time: %s]", 
+	data.latitude, data.longitude, data.altitude, data.header.stamp)
     
 def gps_listener():
 
