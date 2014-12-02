@@ -23,6 +23,7 @@ gpsd.stream(gps.WATCH_ENABLE | gps.WATCH_NEWSTYLE)	#gpsd stuff
 def gps_talker():
     gps_pub = rospy.Publisher('gps_chatter', NavSatFix, queue_size=10)	#instantiating publisher
     rospy.init_node('gps_talker', anonymous=True)	#initializing node
+    global freq
     r = rospy.Rate(freq) # 10hz   
 	
     while not rospy.is_shutdown():
@@ -49,16 +50,17 @@ def gps_talker():
 						
 			gps_msg.header.seq = seq
 						
-			gps_msg.header.stamp = gps_time_unix
+			#gps_msg.header.stamp = gps_time_unix
+			gps_msg.header.stamp = time
 												
 			gps_msg.latitude = gpsd.fix.latitude
 			gps_msg.longitude = gpsd.fix.longitude
 			gps_msg.altitude = gpsd.fix.altitude
-			
-			rospy.loginfo("[lat: %f long: %f alt: %f time: %i]", 
-				gps_msg.latitude, gps_msg.longitude, gps_msg.altitude, gps_msg.header.stamp)
-
+		
 			gps_pub.publish(gps_msg)	#publish ros gps message
+			rospy.loginfo("[lat: %f long: %f alt: %f time: %i:%i]", 
+				gps_msg.latitude, gps_msg.longitude, gps_msg.altitude, gps_msg.header.stamp.secs, gps_msg.header.stamp.nsecs)
+
 						
 			seq +=1
 		else:
