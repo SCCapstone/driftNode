@@ -36,7 +36,7 @@ echo "********hopefully everything else is running, so we're going for it now...
 
 #starting camera node
    echo "********starting camera node********"
-   rosrun raspicam raspicam_node _width:=1200 _height:=900 _framerate:=1 _quality:=75 _tf_prefix:=pi- &
+   rosrun raspicam raspicam_node _width:=1200 _height:=900 _framerate:=2 _quality:=75 _tf_prefix:=pi- &
    sleep 20	#giving the pi some time to start node so it doesn't have a conniption
    echo "********started camera node********"
    echo "********calling service to start camera capture********"
