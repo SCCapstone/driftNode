@@ -10,7 +10,7 @@ from sensor_msgs.msg import Imu
 #***********End 'O Imports************#
 
 #**********Global Variables***********#
-freq = 10	#ros looping frequency
+freq = 10	#sensor polling frequency
 seq = 0	#will keep track of the message sequence number
 #*******End 'O Global Variables*******#
 
@@ -28,9 +28,10 @@ def imu_talker():
 	try:
 		#raw_data_str = subprocess.check_output(["/home/pi/ros_catkin_ws/src/imu_node/scripts/ahrs_raw.sh"])
 		raw_data_str = process.stdout.readline()	#reading next line from the imu process' raw data stream
-		rospy.loginfo(raw_data_str)	#printing raw data stream to ros console
+		#if seq%50 == 0:	#not printing all lines so we don't swap the terminal
+			#rospy.loginfo(raw_data_str)	#printing raw data stream to ros console
 	except subprocess.CalledProcessError as e:
-		rospy.loginfo("error running imu script")
+		rospy.logerr("error running imu script")
 
 	raw_vals = []	#array that imu data from raw data stream will be read into
 	for t in raw_data_str.split():
@@ -63,7 +64,7 @@ def imu_talker():
 		imu_pub.publish(imu_msg)	#publish imu message to the ros topic (imu_chatter)
 		seq += 1	#incrementing sequence number
 	else:
-		rospy.loginfo("error parsing values")
+		rospy.logerr("error parsing values")
 
 	r.sleep()	#ros goes night night because of frequency stuff
         
@@ -74,5 +75,5 @@ if __name__ == '__main__':
 	imu_talker()
 
     except rospy.ROSInterruptException: 
-	rospy.loginfo("main except")
+	rospy.logerr("main except")
 	pass

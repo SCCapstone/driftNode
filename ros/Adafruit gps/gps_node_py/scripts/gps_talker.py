@@ -58,16 +58,18 @@ def gps_talker():
 			gps_msg.altitude = gpsd.fix.altitude
 		
 			gps_pub.publish(gps_msg)	#publish ros gps message
-			rospy.loginfo("[lat: %f long: %f alt: %f time: %i:%i]", 
-				gps_msg.latitude, gps_msg.longitude, gps_msg.altitude, gps_msg.header.stamp.secs, gps_msg.header.stamp.nsecs)
+			if seq%25 ==0:	#not printing all lines so we don't swap the terminal
+				rospy.loginfo("[lat: %f long: %f alt: %f time: %i:%i]", 
+					gps_msg.latitude, gps_msg.longitude, gps_msg.altitude, gps_msg.header.stamp.secs, gps_msg.header.stamp.nsecs)
 
 						
 			seq +=1
 		else:
-			rospy.loginfo("GPSD is being obtuse.  Probably just no GPS fix yet.")
+			#rospy.logwarn("GPSD is being obtuse.  Probably just no GPS fix yet.")
+			pass
 		
 	except Exception:	#yup, gpsd is being obtuse
-		rospy.loginfo("Exception when reading GPSD data.  The time is probably being stupid.")
+		rospy.logerr("Exception when reading GPSD data.  The time is probably being stupid.")
 		#print(sys.exc_info()[0])
 		pass
 
@@ -77,5 +79,5 @@ if __name__ == '__main__':
 	try:
 		gps_talker()
 	except rospy.ROSInterruptException: 
-		rospy.loginfo("main except")
+		rospy.logerr("main except")
 		pass
