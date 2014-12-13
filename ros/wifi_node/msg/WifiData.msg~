@@ -1,0 +1,6 @@
+#contains all the wifi node informations
+Header header
+string Address
+string ESSID
+string Quality
+string Signal
