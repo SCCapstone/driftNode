@@ -58,7 +58,7 @@ def gps_talker():
 			gps_msg.altitude = gpsd.fix.altitude
 		
 			gps_pub.publish(gps_msg)	#publish ros gps message
-			if seq%25 ==0:	#not printing all lines so we don't swap the terminal
+			if seq%25 ==0:	#not printing all lines so we don't swamp the terminal
 				rospy.loginfo("[lat: %f long: %f alt: %f time: %i:%i]", 
 					gps_msg.latitude, gps_msg.longitude, gps_msg.altitude, gps_msg.header.stamp.secs, gps_msg.header.stamp.nsecs)
 
@@ -66,6 +66,12 @@ def gps_talker():
 			seq +=1
 		else:
 			#rospy.logwarn("GPSD is being obtuse.  Probably just no GPS fix yet.")
+			###Printing Zeros Until We Get A GPS Signal###			
+			gps_msg.latitude = 0
+			gps_msg.longitude = 0
+			gps_msg.altitude = 0
+		
+			gps_pub.publish(gps_msg)	#publish ros gps message
 			pass
 		
 	except Exception:	#yup, gpsd is being obtuse
