@@ -64,7 +64,21 @@ def imu_talker():
 		imu_pub.publish(imu_msg)	#publish imu message to the ros topic (imu_chatter)
 		seq += 1	#incrementing sequence number
 	else:
-		rospy.logerr("error parsing values")
+		#rospy.logerr("error parsing values")
+		###Printing Zeros if Error Reading From IMU###		
+		imu_msg.orientation.x = 0
+		imu_msg.orientation.y = 0
+		imu_msg.orientation.z = 0
+	
+		imu_msg.angular_velocity.x = 0
+		imu_msg.angular_velocity.y = 0
+		imu_msg.angular_velocity.z = 0
+
+		imu_msg.linear_acceleration.x = 0
+		imu_msg.linear_acceleration.y = 0
+		imu_msg.linear_acceleration.z = 0
+
+		imu_pub.publish(imu_msg)
 
 	r.sleep()	#ros goes night night because of frequency stuff
         
