@@ -1,10 +1,13 @@
 #!/bin/bash
 
-echo "Running driftNode startup"
+echo "driftNode starting up"
+
+#making sure GPS fix led is off before starting
+sudo python /home/pi/Desktop/GPIOLEDoff.py
 
 #setting node name
-export ROS_NAMESPACE=dn1	#this is to prefix topics with the node id
-echo "Node name set to: $ROS_NAMESPACE"
+export ROS_NAMESPACE=dn2	#this is to prefix topics with the node id
+echo "Node: $ROS_NAMESPACE"
 #####BE SURE TO CHANGE NODE ID IN CAMERA CAPTURE SERVICE IN THIS FILE#####
 
 #setting up ad-hoc network
@@ -17,15 +20,14 @@ echo "ad-hoc network set up"
 sleep 5
 
 #starting the GPS reader that will wait until the GPS gets a fix before starting everything else
-echo "Waiting for the GPS to get a signal before starting ROS"
-
+echo "starting the GPS reader. Once it gets a fix green led will illuminate and ROS will start"
 #the program that will wait until the GPS has a fix before exiting
 python /home/pi/Desktop/GPSreader.py > GPSstartLog.txt
 
 #waits until the GPS reader exits so we know the GPS has a fix
 wait $!
 
-echo "Got GPS Signal"
+sudo python /home/pi/Desktop/GPIOLEDon.py
 
 #Starts driftNode ROS Stuff
 

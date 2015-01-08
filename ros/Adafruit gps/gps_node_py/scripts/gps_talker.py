@@ -31,7 +31,12 @@ def gps_talker():
 	try:	#making sure gpsd isn't being obtuse
 		report = gpsd.next()
 		#print report
-		if not numpy.isnan(gpsd.fix.altitude):
+		#print gpsd.fix.track
+		#print " "
+		#print gpsd.satellites
+		#if not numpy.isnan(gpsd.fix.altitude):
+		if not numpy.isnan(gpsd.fix.track):
+			
 			global seq
 			
 			time = rospy.get_rostime()
@@ -40,13 +45,13 @@ def gps_talker():
 			gps_time_unix = calendar.timegm(gps_time.utctimetuple()) #converting utc time to unix time
 			#print(gps_time_unix)
 			
-			global time_set
-			if not time_set:
-				pi_time = gps_time.strftime("%b %d %Y %H:%M:%S UTC")
-				process = subprocess.Popen(["sudo", "date", "-s", pi_time])			
-				#os.system('sudo date --set=string %s' % pi_time)
-				time_set = True			
-				rospy.loginfo("System time updated")
+			#global time_set
+			#if not time_set:
+			#	pi_time = gps_time.strftime("%b %d %Y %H:%M:%S UTC")
+			#	process = subprocess.Popen(["sudo", "date", "-s", pi_time])			
+			#	#os.system('sudo date --set=string %s' % pi_time)
+			#	time_set = True			
+			#	rospy.loginfo("System time updated")
 						
 			gps_msg.header.seq = seq
 						
@@ -58,9 +63,9 @@ def gps_talker():
 			gps_msg.altitude = gpsd.fix.altitude
 		
 			gps_pub.publish(gps_msg)	#publish ros gps message
-			if seq%25 ==0:	#not printing all lines so we don't swamp the terminal
-				rospy.loginfo("[lat: %f long: %f alt: %f time: %i:%i]", 
-					gps_msg.latitude, gps_msg.longitude, gps_msg.altitude, gps_msg.header.stamp.secs, gps_msg.header.stamp.nsecs)
+			#if seq%50 == 0:	#not printing all lines so we don't swamp the terminal
+				#rospy.loginfo("[lat: %f long: %f alt: %f time: %i:%i]", 
+					#gps_msg.latitude, gps_msg.longitude, gps_msg.altitude, gps_msg.header.stamp.secs, gps_msg.header.stamp.nsecs)
 
 						
 			seq +=1
@@ -75,7 +80,7 @@ def gps_talker():
 			pass
 		
 	except Exception:	#yup, gpsd is being obtuse
-		rospy.logerr("Exception when reading GPSD data.  The time is probably being stupid.")
+		rospy.logerr("Exception when reading GPSD data.")
 		#print(sys.exc_info()[0])
 		pass
 
