@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC -O2 -g -DNDEBUG  -pthread   -shared -Wl,-soname,libgaussian_process.so -o ../lib/libgaussian_process.so CMakeFiles/gaussian_process.dir/src/SingleGP.cpp.o CMakeFiles/gaussian_process.dir/src/covarianceFunctions.cpp.o 

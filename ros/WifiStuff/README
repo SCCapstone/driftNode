@@ -1,7 +1,0 @@
-Stick these folders in the src folder of the catkin workspace then run these commands:
-rosdep install gaussian_process
-sudo apt-get install libiw-dev
-rosmake wifi_tools
-
-The node to run is:
-rosrun wifi_tools wifi_stumbler
