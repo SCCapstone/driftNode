@@ -1,0 +1,16 @@
+*********************************************************************************
+****			wifi_gps_plotter.py Instructions		     ****
+*********************************************************************************
+
+This Node will take in two driftnode names as input and plot the wifi signal strength vs distance in meters.
+
+The format to run this node is: rosrun wifi_node wifi_gps_plotter.py "dnX" "dnY"
+
+Where dnX is the node that you want to use that retrieved the wifi signal strength from its sensor and dnY is the node that dnX saw with the sensor
+
+You must also have the topics playing already synchronized. To do this just load the two bags into rqt and be sure to right click
+on the topics and say publish all.
+
+Also you must have already ran the fixWifi.bash script on the bag that will be used for dnX
+
+Author: Zachary Smith

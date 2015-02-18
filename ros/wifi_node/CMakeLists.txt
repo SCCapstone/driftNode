@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  message_filters
 )
 
 ## System dependencies are found with CMake's conventions
@@ -84,7 +85,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   #INCLUDE_DIRS include
   LIBRARIES wifi_node
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime sensor_msgs message_filters
   DEPENDS system_lib
 )
 
