@@ -1,0 +1,17 @@
+The fixWifi.bash script will take a bag file and take its wifi data and convert it into a usable form so that it can be plotted.
+
+The format to run the script is:
+
+./fixWifi.bash input.bag "nodeName" "nodeName2"
+
+input.bag - This is the name of the bag you want to fix
+nodeName - This is the name of the node that created the bag
+nodeName2 - This is the name of the node that the wifi data was looking at
+
+for example if dn3 created the bag and over wifi it saw dn3 you will run:
+
+./fixWifi.bash input.bag "dn3" "dn1"
+
+This will add to the bag a topic called /dn1Signal which is the signal strength from dn3 to dn1
+
+
