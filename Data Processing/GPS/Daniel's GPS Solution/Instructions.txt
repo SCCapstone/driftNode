@@ -1,0 +1,15 @@
+1.) Run this command:
+	roslaunch rosbridge_server rosbridge_websocket.launch
+
+2.) Go to the directory "ROS_GPS_Visualizer_files" and select the "ROSGPSVisualizer.html" file and open it in a web browser.
+
+3.) Fill the following information:
+	Address: [should be able to leave this as the default]
+	GPS Topic: [the name of the gps topic stored in the bag]
+	Max msgs/markers: [unless you want a specifc amount leave as 0]
+	Connection: [click the switch and move it over to the "On" position]
+
+4.) Run this command:
+	rosbag play -r (10, or any number you want to make it faster) [directory]/[bagname].bag
+
+5.) Profit??!? 

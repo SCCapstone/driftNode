@@ -28,6 +28,8 @@
 </style>
 
 <script>
+//FIXED BY: Daniel Boydstun
+
 var map;
 var initPos = new google.maps.LatLng(45.504824264187214, -73.57661962509155);
 var styleArray = [
@@ -169,7 +171,7 @@ function toggleConnection() {
 		//window.alert("topic has been set to: " + document.getElementById("gps_topic").value);
     		if (topic.length <= 0) 
 		{
-      			topic = "/gps/fix";
+      			topic = "/dn3/gps_chatter";
 			//window.alert("No topic, so we set default.");
     		}
 		//window.alert("Attempting to connect to: " + 'ws://' + addr);
@@ -201,7 +203,7 @@ function toggleConnection() {
 
   <div data-role="fieldcontain">
   <label for="gps_ip">GPS Topic: </label>
-  <input type="text" data-mini="true" data-clear-btn="true" name="gps_topic" id="gps_topic" value="/gps/fix" placeholder="/gps/fix" />
+  <input type="text" data-mini="true" data-clear-btn="true" name="gps_topic" id="gps_topic" value="/dn3/gps_chatter" placeholder="/dn3/gps_chatter" />
   </div>
 
   <div data-role="fieldcontain">
