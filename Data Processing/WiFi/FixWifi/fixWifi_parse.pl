@@ -8,10 +8,10 @@ close(FILE);
 open(FILE,">",@ARGV[1]);
 #$concatLines=join('',@Lines);
 foreach(@Lines){
-    if ($_ =~ m:dn1\s*?,\s*?(\d+)\/100\s*?,\s*?(\d+)\/100:g) { #Text after first match
-	  $MatchText='dn1,'.$1.','.$2;
+    if ($_ =~ m:@ARGV[2]\s*?,\s*?(\d+)\/100\s*?,\s*?(\d+)\/100:g) { #Text after first match
+	  $MatchText=@ARGV[2].','.$1.','.$2;
 	} else{
-	  $MatchText='dn1,000,000';
+	  $MatchText=@ARGV[2].',000,000';
 	}
 	$MatchText=$MatchText."\n";
 	print FILE "$MatchText";

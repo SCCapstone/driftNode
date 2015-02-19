@@ -10,7 +10,7 @@ done
 echo "Done extracting data, saved to file: data.txt"
 
 echo "Parsing data from file: data.txt"
-perl ./fixWifi_parse.pl "data.txt" "parsed_data.txt"
+perl ./fixWifi_parse.pl "data.txt" "parsed_data.txt" $3
 
 echo "Done parsing data, saved to file: parsed_data.txt"
 
