@@ -346,6 +346,8 @@
 
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
+\usepackage{hyphenat}
+\long\def\invis#1{}
 
 
 \begin{document}
@@ -440,21 +442,83 @@ This paper presents
 \begin{figure}[!t]
 \centering
 \includegraphics[width=2.5in]{figures/beautyCrop}
-\caption{Deployment}
+\caption{Deployment of three drifters over the coral reef off the Bellairs Research Center, Barbados. }
 \label{fig_beauty}
 \end{figure}
 
 \section{Background}
+The problem of tracking ocean currents was very important for navigation, sailors off the Marshal Islands utilized twig maps to record the direction of different currents and swells~\cite{twigMaps}. As early as 1953, floating devises were used to record the Lagrangian motion of the currents~\cite{swallow1955neutral}. Around the same time, Laughton~\cite{laughton1958new} developed an deep sea underwater camera to obtain additional information. 
+
+\cite{oroza2013design}
+\cite{johnson2003compact}
+\cite{drifters2003observing}
+\cite{davis2001profiling}
+\cite{rossby1985isopycnal}
+\cite{britton2004secoas}
+
+ 
+Tinka et al.~\cite{tinka2013floating} developed an actuated floating sensor network for estimating water flow.  
 
 \section{Hardware design}
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.5in]{figures/Schematic}
+\caption{Schematic of hardware components and their connectivity used in the deployed drifters.}
+\label{fig_diagram}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.5in]{figures/Nodes}
+\caption{The assembled electronics for the three drift nodes.}
+\label{fig_hw}
+\end{figure}
+
+
 \section{Software design}
+
 \section{Current Estimation}
 Using the GPS trail over time we can estimate the combined wave and current action using the Lagrangian model. 
+
 \section{Underwater Vision}
+The driftNode uses a camera mounted on the bottom of the enclosure to capturing images at 2Hz. 
+These images are then stitched together in a single larger image so that the entire path the driftNode took can be 
+viewed as a single large image. If other nodes took a similar path the images captured can be used in conjunction 
+to give a larger picture of the ocean floor. In this manner multiple driftNodes can be used to map shallow coral 
+reefs. 
+
+	 
 \subsection{Transect Mapping}
+
 \subsection{Wave Actuated Vision}
+Using ocean waves to actuate the driftNode allows the camera a wider field of vision as the camera's field 
+of view is shifting. The cameras field of view can be modeled as wondering about a hemisphere. When combined with 
+the linear motion imparted by ocean currents or wind this gives the camera field of view hemispherical view of the ocean floor.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.45\textwidth]{figures/rviz_imu}
+\caption{Schematic of hardware components and their connectivity used in the deployed drifters.}
+\label{fig_imu}
+\end{figure}
+
+\invis{In order to get some meaningful information out of the raw IMU data that the driftNodes recorded there needed to be some way of interpreting and visualizing it in a human-readable fashion.  RViz seems to be the best method of displaying the data in an easily understandable format.  In order to visualize the IMU messages bags in RViz a frame id needed to be added to every message so that RViz could interpret them.  This is something that will be done as the driftNodes are running in the future to eliminate the need to post process the IMU messages using the RosBag API.  With the IMU messages in the bags fixed RViz is now able to display a 3D model which represents the node and the forces from the water that are acting on it, as can be seen below.
+
+Ultimately this IMU data will be combined with the data from the driftNodes? GPSs and will be used more accurately stich the images from the driftNodes? cameras together and have a better visualization of the ocean floor.
+}
 
 \section{Cooperative Localization using WiFi signal}
+\invis{Hardware:
+The hardware we used for wifi was the "Edimax EW-7811Un" wifi dongle. 
+
+Wifi node:
+The signal strength the wifi gets is a number out of 100. To extract the wifi data for the wifi node I used the iwlist bash command along with other commands to filter out the necessary information that gave us MAC Address, ESSID, signal quality and signal strength. This information was stored in an array of wifi messages that each contatin the four fields of wifi information. This resulted in bags that had a random length of wifi messages at any given time which was unusable in post processing.
+
+Fixing the data:
+To fix the bags I wrote scripts to first take the wifi data out of the bag into a csv file and then use regular expressions to find only the information for a certain node, instead of random wifi signals of the hotel and other networks. In certain messages the node I was looking for wasn't there because it was out of range so I had to replace those instances with a signal strength of zero. I then put that information back into the bag. 
+
+Plotting the data:
+To plot the data I had to find a way to get data from two bags simultaneously and also be synchronized. I used rqt to synchronize the bags because it does this automatically if you just load in two bag files. I then wrote a listener ros node that has three callbacks (one callback can be used if each topic you are lookign for has a header with timestamps, but the wifi node doesn't have a header which is another thing that needs to be changed in the future). To get the three topic information (the wifi signal strength from node1, the gps coordinates from node1, and the gps coordinates from node2) I had to store the data from each callback into a global variables and wait until each variable from each topic (signal strength, gps1Latitude,gps1Longitude,gps2Latitude,gps3Longitude) had useful information, because even though the bags are synchronized, each topic records at a different rate and also the bags don't line up one to one and differ by an amount of nano seconds. Each time every variable is filled with data I plot the data and then reset the variables and wait for them to fill up again. To convert the longitude and latitude coordinates into distance I used the haversine formula with r = 6378100 where r is the radius of the earth in meters. The implemented formula is inside of the wifi_gps_plotter node that I wrote in the haversine function. As far as plotting the scatter plot, I used the matplotlib for python and its scatterplot functions which isn't exactly made for real time plotting of data but it works fine for what we needed it for. }
 
 \section{Conclusion}
 The conclusion goes here. this is more of the conclusion
