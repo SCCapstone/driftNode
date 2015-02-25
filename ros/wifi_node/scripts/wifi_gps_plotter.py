@@ -23,6 +23,8 @@ import message_filters
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import random
+from matplotlib import colors as col
 from std_msgs.msg import String, Int32
 from wifi_node.msg import WifiMsgs
 from sensor_msgs.msg import NavSatFix
@@ -38,7 +40,7 @@ globLatitude_node1 = 999 #will hold node1's latitude as it sees from its sensors
 globLongitude_node1 = 999 #will hold node1's longitude as it sees from its sensors
 globLatitude_node2 = 999 #will hold node1's latitude as it sees from its sensors
 globLongitude_node2 = 999 #will hold node1's longitude as it sees from its sensors
-
+globSampler = 12 #will sample the wifi strength after this many points
 
 
 def haversine(lon1, lat1, lon2, lat2):
@@ -62,17 +64,31 @@ def tryToPlot():
     global globLatitude_node2 
     global globLongitude_node2 
     global globWifiStrength_node1
-    distance = 0
+    global globSampler
 
+    distance = 0
+    zoomFactor = 1000
     #We first check if any of the values are 999, if so they are junk and we shouldn't plot this point
     if (globWifiStrength_node1 != 999 and globLatitude_node1 != 999 and globLongitude_node1 != 999 and globLatitude_node2 != 999 and globLongitude_node2 != 999):
 	distance = haversine(globLongitude_node1,globLatitude_node1,globLongitude_node2,globLatitude_node2)
+	plt.subplot(2, 1, 1)
 	plt.title('Wifi Signal Strength Vs Distance (meters)') #Title the graph
         plt.xlabel('distance (meters)')                        #and set up the x
 	plt.ylabel('Signal Strength (XXX/100)')		       #and y labels
 	plt.scatter(distance,globWifiStrength_node1) #create a new point on the graph
+
+	plt.subplot(2, 1, 2)
+	#plt.title('GPS Map With Signal Strength') #Title the graph
+        plt.xlabel('Longitude Zoom = '+str(zoomFactor)+' times')  #and set up the x
+        plt.ylabel('Latitude Zoom = '+str(zoomFactor)+' times')   #and y labels
+	plt.scatter(globLongitude_node1*zoomFactor, globLatitude_node1*zoomFactor, color = (0,1,0))
+	plt.scatter(globLongitude_node2*zoomFactor, globLatitude_node2*zoomFactor, color = (1,0,0))
+        if(int(random.random()*globSampler+1) == globSampler):
+		plt.plot([globLongitude_node1*zoomFactor, globLongitude_node2*zoomFactor], [globLatitude_node1*zoomFactor, globLatitude_node2*zoomFactor], color = (0,0,0),linewidth = (globWifiStrength_node1/10+1))
+		plt.annotate('d = '+str(int(distance))+'m', xy=(globLongitude_node1*zoomFactor, globLatitude_node1*zoomFactor), xytext=(globLongitude_node1*zoomFactor, globLatitude_node1*zoomFactor))
 	plt.draw() #draw the point on the graph
 	rospy.loginfo('Distance: '+str(distance)+'  SignalStrength: '+ str(globWifiStrength_node1))
+	plt.savefig('./gpsWifiGraph.jpg')
 
 	#reset our values and wait for them to be updated again
 	globLatitude_node1 = 999 
