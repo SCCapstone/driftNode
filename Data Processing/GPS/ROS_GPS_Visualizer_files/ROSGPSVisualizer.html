@@ -101,7 +101,7 @@ function callbackGPS(msg)
   	$('#gps_latest_latlon').val('(' + lat.toString() + ',' + lon.toString() + ')');
   	$('#gps_latest_time').val(time.toString());
   
-  	console.log('Recv GPS (' + lat.toString() + ',' + lon.toString() + ') @ ' + time.toString());
+  	console.log('Topic 1: Recv GPS (' + lat.toString() + ',' + lon.toString() + ') @ ' + time.toString());
 
   	var maxNumMarkers = parseInt($('#gps_max_num_markers').val());
   	if (maxNumMarkers > 0) 
@@ -169,7 +169,7 @@ function callbackGPS2(msg)
   	$('#gps_latest_latlon').val('(' + lat2.toString() + ',' + lon2.toString() + ')');
   	$('#gps_latest_time').val(time2.toString());
   
-  	console.log('Recv GPS (' + lat2.toString() + ',' + lon2.toString() + ') @ ' + time2.toString());
+  	console.log('Topic 2: Recv GPS (' + lat2.toString() + ',' + lon2.toString() + ') @ ' + time2.toString());
 
   	var maxNumMarkers2 = parseInt($('#gps_max_num_markers').val());
   	if (maxNumMarkers2 > 0) 
