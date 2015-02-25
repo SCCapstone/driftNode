@@ -1,0 +1,25 @@
+---- INSTRUCTIONS TO PLOT GPS DATA FROM 1 or 2 DRIFT NODES ----
+
+1.) Run this command in 1 terminal:
+	roslaunch rosbridge_server rosbridge_websocket.launch
+
+2.) Open the html file "ROSGPSVisualizer.html" and this will pull up the visualization tool in your default browser if set up that way. Otherwise open it with your browser.
+
+3.) You should not have to change the address as rosbridge should open the websocket on port 9090. If this is not the case match the ports.
+
+4.) The GPS Topic 1 and 2 have been set up already so you should not have to change unless more nodes are produced in the future or dn2 starts working. Otherwise the format is: /dn[# of the driftnode]/gps_chatter
+
+5.) Max msg/s and max markers you don't have to mess with unless you have only a specific amount on the screen at once. (Default is 0 = no limits)
+
+6.) Toggle the connection bar from "Off" to "On"
+
+7.) Run this command in a seperate terminal:
+	rosbag play -r [10, 20, ...] /path/to/bag/files/bagName.bag
+
+	Where the -r allows you to run the bag faster or slower, and the later half is the path to the bags and the bag file itself.
+
+8.) Repeat step 7 if you want to run another bag (HAS TO BE FROM A DIFFERENT NODE)
+
+9.) If you want to stop the plotting you can cancel the rosbag play in the terminal or you can toggle the connection from "On" to "Off"
+
+10.) If by some off chance the plotter is not running properly, try refreshing the page and trying again. Or try running the bags first and then toggle the connection. (This will result in some lost points initally but should work)
