@@ -31,7 +31,7 @@
 //FIXED BY: Daniel Boydstun
 
 var map;
-var initPos = new google.maps.LatLng(13.192246, -59.642539);
+var initPos = new google.maps.LatLng(13.191797, -59.642539);
 var styleArray = [{featureType: "road", stylers: [{ visibility: "off" }]}];
 google.maps.visualRefresh = true;
 
@@ -52,9 +52,9 @@ function initializeMap()
 
 	var polyOptions = 
 	{
-		strokeColor: "#FFFFFF",
+		strokeColor: "#FFFF00",
     		strokeOpacity: 0.8,
-    		strokeWeight: 4
+    		strokeWeight: 3
 	};
   	poly = new google.maps.Polyline(polyOptions);
 	poly.setMap(map);
@@ -63,7 +63,7 @@ function initializeMap()
 	{
 		strokeColor: "#00FF1E",
     		strokeOpacity: 0.8,
-    		strokeWeight: 4
+    		strokeWeight: 3
 	};
   	poly2 = new google.maps.Polyline(poly2Options);
 	poly2.setMap(map);
@@ -77,8 +77,9 @@ var listenerGPS = null;
 var listenerGPS2 = null;
 var prevGPSMsgTime = new Date();
 var prevGPSMsgTime2 = new Date();
-var markers = new Array();
 var waypointLines = null;
+var markers = new Array();
+var markers2 = new Array();
 var path = new Array();
 var path2 = new Array();
 
@@ -117,6 +118,17 @@ function callbackGPS(msg)
 
   	path.push(new google.maps.LatLng(lat, lon));
 
+	if(path.length == 1)
+	{
+		markers.push(new google.maps.Marker({
+    		map: map,
+    		draggable: false,
+    		clickable: true,
+    		title: "Origin; Lat = "+lat.toString()+"; Lon = "+lon.toString(),
+    		animation: google.maps.Animation.DROP,
+    		position: new google.maps.LatLng(lat, lon)
+  		}));
+	}
 	//path.setMap(map);
 /*
   markers.push(new google.maps.Marker({
@@ -185,6 +197,17 @@ function callbackGPS2(msg)
 
   	path2.push(new google.maps.LatLng(lat2, lon2));
 
+	if(path2.length == 1)
+	{
+		markers2.push(new google.maps.Marker({
+    		map: map,
+    		draggable: false,
+    		clickable: true,
+    		title: "Origin; Lat = "+lat2.toString()+"; Lon = "+lon2.toString(),
+    		animation: google.maps.Animation.DROP,
+    		position: new google.maps.LatLng(lat2, lon2)
+  		}));
+	}
 	//path2.setMap(map);
 };
 
