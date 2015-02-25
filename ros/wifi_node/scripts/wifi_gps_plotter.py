@@ -36,6 +36,7 @@ from math import radians, cos, sin, asin, sqrt
 #Global Variables 
 #999 means it does not currently have a valid answer
 globWifiStrength_node1 = 999 #will hold node1's wifi strength that it sees for node2
+globWifiStrength_node2 = 999 #will hold node2's wifi strength that it sees for node1
 globLatitude_node1 = 999 #will hold node1's latitude as it sees from its sensors
 globLongitude_node1 = 999 #will hold node1's longitude as it sees from its sensors
 globLatitude_node2 = 999 #will hold node1's latitude as it sees from its sensors
@@ -64,20 +65,24 @@ def tryToPlot():
     global globLatitude_node2 
     global globLongitude_node2 
     global globWifiStrength_node1
+    global globWifiStrength_node2
     global globSampler
+    global dataFile
 
     distance = 0
     zoomFactor = 1000
     #We first check if any of the values are 999, if so they are junk and we shouldn't plot this point
     if (globWifiStrength_node1 != 999 and globLatitude_node1 != 999 and globLongitude_node1 != 999 and globLatitude_node2 != 999 and globLongitude_node2 != 999):
 	distance = haversine(globLongitude_node1,globLatitude_node1,globLongitude_node2,globLatitude_node2)
-	plt.subplot(2, 1, 1)
+
+
+	plt.subplot(2, 1, 1) #This plot will hold the scatter plot of wifi strength vs distance
 	plt.title('Wifi Signal Strength Vs Distance (meters)') #Title the graph
         plt.xlabel('distance (meters)')                        #and set up the x
 	plt.ylabel('Signal Strength (XXX/100)')		       #and y labels
 	plt.scatter(distance,globWifiStrength_node1) #create a new point on the graph
 
-	plt.subplot(2, 1, 2)
+	plt.subplot(2, 1, 2) #This plot will hold the map of gps coordinates and their distance/wifistrength
 	#plt.title('GPS Map With Signal Strength') #Title the graph
         plt.xlabel('Longitude Zoom = '+str(zoomFactor)+' times')  #and set up the x
         plt.ylabel('Latitude Zoom = '+str(zoomFactor)+' times')   #and y labels
@@ -90,20 +95,33 @@ def tryToPlot():
 	rospy.loginfo('Distance: '+str(distance)+'  SignalStrength: '+ str(globWifiStrength_node1))
 	plt.savefig('./gpsWifiGraph.jpg')
 
+	#For writing a csv file of all the data
+	dataFile.write(str(globLatitude_node1)+','+str(globLongitude_node1)+','+
+			str(globLatitude_node2)+','+str(globLongitude_node2)+','+
+			str(globWifiStrength_node1)+','+str(globWifiStrength_node2)+','+
+			str(distance)+'\n')
+
 	#reset our values and wait for them to be updated again
 	globLatitude_node1 = 999 
     	globLongitude_node1 = 999
 	globLatitude_node2 = 999
     	globLongitude_node2 = 999
 	globWifiStrength_node1 = 999
+	globWifiStrength_node2 = 999
 
 
-def callbackWifi(wifi_msg):	#wifi_msgs will become populated with the wifi message from the talker
+def callbackWifi1(wifi_msg):	#wifi_msgs will become populated with the wifi message from the talker
     global globWifiStrength_node1
     #rospy.loginfo(rospy.get_caller_id())
     #rospy.loginfo(wifi_msg.data)
     globWifiStrength_node1 = wifi_msg.data
     tryToPlot()
+
+def callbackWifi2(wifi_msg):	#wifi_msgs will become populated with the wifi message from the talker
+    global globWifiStrength_node2
+    #rospy.loginfo(rospy.get_caller_id())
+    #rospy.loginfo(wifi_msg.data)
+    globWifiStrength_node2 = wifi_msg.data
 
 
 def callbackGPS1(gps_data1):	#gps_data1 will become populated with the gps message from the talker
@@ -128,11 +146,13 @@ def callbackGPS2(gps_data2):	#gps_data2 will become populated with the gps messa
 def wifi_gps_plotter():
 
     rospy.init_node('wifi_gps_listener', anonymous=True)	#declaring listener node
-    wifi_sub = message_filters.Subscriber('/'+sys.argv[1]+'/'+sys.argv[2]+'SignalStrength', Int32)
+    wifi_sub1 = message_filters.Subscriber('/'+sys.argv[1]+'/'+sys.argv[2]+'SignalStrength', Int32)
+    wifi_sub2 = message_filters.Subscriber('/'+sys.argv[2]+'/'+sys.argv[1]+'SignalStrength', Int32)
     gps_sub1 = message_filters.Subscriber('/'+sys.argv[1]+'/gps_chatter', NavSatFix)
     gps_sub2 = message_filters.Subscriber('/'+sys.argv[2]+'/gps_chatter', NavSatFix)
 
-    wifi_sub.registerCallback(callbackWifi)
+    wifi_sub1.registerCallback(callbackWifi1)
+    wifi_sub1.registerCallback(callbackWifi2)
     gps_sub1.registerCallback(callbackGPS1)
     gps_sub2.registerCallback(callbackGPS2)
 		
@@ -141,8 +161,14 @@ def wifi_gps_plotter():
     rospy.spin()	#keeping the listener alive
 
 
-
 if __name__ == '__main__':
+    dataFile = open('./GPSandWifiData.csv','w') #file to store the data
+
+    dataFile.write('Latitude_'+sys.argv[1]+','+'Longitude_'+sys.argv[1]+','+
+			'Latitude_'+sys.argv[2]+','+'Longitude_'+sys.argv[2]+','+
+			'WifiStrength_'+sys.argv[1]+'to'+sys.argv[2]+','+'WifiStrength_'+sys.argv[2]+'to'+sys.argv[1]+','+
+			'Distance (meters)'+'\n')
+
     plt.ion() #Makes the graph be able to be updated in real time
     plt.show(block = False) #Shows the graph and doesn't block the node from running
     wifi_gps_plotter()

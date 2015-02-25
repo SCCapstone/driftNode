@@ -8,7 +8,7 @@ input.bag - This is the name of the bag you want to fix
 nodeName - This is the name of the node that created the bag
 nodeName2 - This is the name of the node that the wifi data was looking at
 
-for example if dn3 created the bag and over wifi it saw dn3 you will run:
+for example if dn3 created the bag and over wifi it saw dn1 you will run:
 
 ./fixWifi.bash input.bag "dn3" "dn1"
 
