@@ -28,12 +28,25 @@
 </style>
 
 <script>
-//FIXED BY: Daniel Boydstun
+//FIXED & EDITED BY: Daniel Boydstun
 
 var map;
 var initPos = new google.maps.LatLng(13.191797, -59.642539);
 var styleArray = [{featureType: "road", stylers: [{ visibility: "off" }]}];
+var infowindow = new google.maps.InfoWindow({
+	content: "" });
 google.maps.visualRefresh = true;
+var ros = new ROSLIB.Ros();
+var connected = false;
+var listenerGPS = null;
+var listenerGPS2 = null;
+var prevGPSMsgTime = new Date();
+var prevGPSMsgTime2 = new Date();
+var waypointLines = null;
+var markers = new Array();
+var markers2 = new Array();
+var path = new Array();
+var path2 = new Array();
 
 function initializeMap() 
 {
@@ -67,21 +80,67 @@ function initializeMap()
 	};
   	poly2 = new google.maps.Polyline(poly2Options);
 	poly2.setMap(map);
+
+	google.maps.event.addListener(poly, 'mouseover', function (event) {
+		var lat1 = markers[0].getPosition().lat();
+		var lat2 = event.latLng.lat();
+		var lng1 = markers[0].getPosition().lng();
+		var lng2 = event.latLng.lng();
+
+		var R = 6371000;
+		var phi1 = lat1 * Math.PI/180;
+		var phi2 = lat2 * Math.PI/180;
+		var dPhi = (lat2-lat1) * Math.PI/180;
+		var dLambda = (lng2-lng1) * Math.PI/180;
+
+		var a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
+       		Math.cos(phi1) * Math.cos(phi2) *
+        	Math.sin(dLambda/2) * Math.sin(dLambda/2);
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+		var d = R * c;
+
+		infowindow.setContent("Latitude: "+ lat2 + ";<br>Longitude " + lng2+";<br><br>Cartesian Distance to Origin Point: " + d + " m");
+        	infowindow.setPosition(event.latLng);
+		infowindow.open(map);
+    	}); 
+    
+    	google.maps.event.addListener(poly, 'mouseout', function () {
+        	infowindow.close();
+    	});
+
+	google.maps.event.addListener(poly2, 'mouseover', function (event) {
+		var lat1 = markers2[0].getPosition().lat();
+		var lat2 = event.latLng.lat();
+		var lng1 = markers2[0].getPosition().lng();
+		var lng2 = event.latLng.lng();
+
+		var R = 6371000;
+		var phi1 = lat1 * Math.PI/180;
+		var phi2 = lat2 * Math.PI/180;
+		var dPhi = (lat2-lat1) * Math.PI/180;
+		var dLambda = (lng2-lng1) * Math.PI/180;
+
+		var a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
+       		Math.cos(phi1) * Math.cos(phi2) *
+        	Math.sin(dLambda/2) * Math.sin(dLambda/2);
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+		var d = R * c;
+
+		infowindow.setContent("Latitude: "+ lat2 + ";<br>Longitude " + lng2+";<br><br>Cartesian Distance to Origin Point: " + d + " m");
+        	infowindow.setPosition(event.latLng);
+		infowindow.open(map);
+    	}); 
+    
+    	google.maps.event.addListener(poly2, 'mouseout', function () {
+        	infowindow.close();
+    	});
 }
+
+google.maps.event.addListener(path2, "mouseover", function(event) { alert('mouseover ' + path2.latLng); });
+
 google.maps.event.addDomListener(window, 'load', initializeMap);
-
-
-var ros = new ROSLIB.Ros();
-var connected = false;
-var listenerGPS = null;
-var listenerGPS2 = null;
-var prevGPSMsgTime = new Date();
-var prevGPSMsgTime2 = new Date();
-var waypointLines = null;
-var markers = new Array();
-var markers2 = new Array();
-var path = new Array();
-var path2 = new Array();
 
 function callbackGPS(msg) 
 {
@@ -113,53 +172,25 @@ function callbackGPS(msg)
       			removedMarker.setMap(null);
     		}
   	}
-  
-  	path = poly.getPath();
-
-  	path.push(new google.maps.LatLng(lat, lon));
-
-	if(path.length == 1)
+  	
+	if( (lat != 0) && (lon != 0) ) // Assuming we are never at (0, 0) this will "catch" the holes in the bags and prevent them from ruining the map.
 	{
-		markers.push(new google.maps.Marker({
-    		map: map,
-    		draggable: false,
-    		clickable: true,
-    		title: "Origin; Lat = "+lat.toString()+"; Lon = "+lon.toString(),
-    		animation: google.maps.Animation.DROP,
-    		position: new google.maps.LatLng(lat, lon)
-  		}));
+  		path = poly.getPath();
+
+  		path.push(new google.maps.LatLng(lat, lon));
+
+		if(path.length == 1)
+		{
+			markers.push(new google.maps.Marker({
+    			map: map,
+    			draggable: false,
+    			clickable: true,
+    			title: "Origin; Lat = "+lat.toString()+"; Lon = "+lon.toString(),
+    			animation: google.maps.Animation.DROP,
+    			position: new google.maps.LatLng(lat, lon)
+  			}));
+		}
 	}
-	//path.setMap(map);
-/*
-  markers.push(new google.maps.Marker({
-    map: map,
-    draggable: false,
-    clickable: true,
-    title: str,
-    animation: google.maps.Animation.DROP,
-    position: new google.maps.LatLng(lat, lon)
-  }));
-
-  var waypointCoordinates = new Array();
-  var i;
-  for (i = 0; i < markers.length; i++) 
-  {
-    waypointCoordinates[i] = markers[i].position;
-  }
-
-  if (waypointLines != null) 
-  {
-    waypointLines.setMap(null);
-  }
-
-  waypointLines = new google.maps.Polyline({
-    path: waypointCoordinates,
-    strokeColor: "#FFFFFF",
-    strokeOpacity: 0.8,
-    strokeWeight: 4
-  });*/
-
-  //waypointLines.setMap(map);
 };
 
 function callbackGPS2(msg) 
@@ -193,22 +224,24 @@ function callbackGPS2(msg)
     		}
   	}
   
-  	path2 = poly2.getPath();
-
-  	path2.push(new google.maps.LatLng(lat2, lon2));
-
-	if(path2.length == 1)
+	if( (lat2 != 0) && (lon2 != 0) ) // Assuming we are never at (0, 0) this will "catch" the holes in the bags and prevent them from ruining the map.
 	{
-		markers2.push(new google.maps.Marker({
-    		map: map,
-    		draggable: false,
-    		clickable: true,
-    		title: "Origin; Lat = "+lat2.toString()+"; Lon = "+lon2.toString(),
-    		animation: google.maps.Animation.DROP,
-    		position: new google.maps.LatLng(lat2, lon2)
-  		}));
+  		path2 = poly2.getPath();
+
+  		path2.push(new google.maps.LatLng(lat2, lon2));
+
+		if(path2.length == 1)
+		{
+			markers2.push(new google.maps.Marker({
+    			map: map,
+    			draggable: false,
+    			clickable: true,
+    			title: "Origin; Lat = "+lat2.toString()+"; Lon = "+lon2.toString(),
+    			animation: google.maps.Animation.DROP,
+    			position: new google.maps.LatLng(lat2, lon2)
+  			}));
+		}
 	}
-	//path2.setMap(map);
 };
 
 function clearWaypoints() 
@@ -218,14 +251,12 @@ function clearWaypoints()
     		var removedMarker = markers.pop();
     		removedMarker.setMap(null);
   	}
-  	console.log('1');
-  
-  	if (waypointLines != null) 
-	{
-    		waypointLines.setMap(null);
-  	}
-  	console.log('2');
 
+	while (markers2.length > 0) 
+	{
+    		var removedMarker = markers2.pop();
+    		removedMarker.setMap(null);
+  	}
   	$('#gps_clear_markers').parent().removeClass('ui-btn-active');
 };
 
@@ -261,32 +292,24 @@ function toggleConnection()
 	else 
 	{ // Connect to ROSBridge server
 		var addr = document.getElementById("gps_addr").value;
-		//window.alert("addr has bern set to: " + document.getElementById("gps_addr").value);
     		if (addr.length <= 0) 
 		{
       			addr = "localhost:9090";
-			//window.alert("No addr, so we set default.");
     		}
 		var topic = document.getElementById("gps_topic").value;
-		//window.alert("topic has been set to: " + document.getElementById("gps_topic").value);
     		if (topic.length <= 0) 
 		{
       			topic = "/dn1/gps_chatter";
-			//window.alert("No topic, so we set default.");
     		}
-		//window.alert("Attempting to connect to: " + 'ws://' + addr);
 
 		var topic2 = document.getElementById("gps_topic2").value;
-		//window.alert("topic has been set to: " + document.getElementById("gps_topic").value);
     		if (topic2.length <= 0) 
 		{
       			topic2 = "/dn3/gps_chatter";
-			//window.alert("No topic, so we set default.");
     		}
 
     		ros.connect('ws://' + addr);
     		connected = true;
-    		//window.alert("We connected.");
     		listenerGPS = new ROSLIB.Topic({
       			ros : ros,
       			name : topic,

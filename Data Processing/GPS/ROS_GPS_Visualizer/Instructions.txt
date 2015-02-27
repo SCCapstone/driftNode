@@ -13,10 +13,9 @@
 
 6.) Toggle the connection bar from "Off" to "On"
 
-7.) Run this command in a seperate terminal:
-	rosbag play -r [10, 20, ...] /path/to/bag/files/bagName.bag
-
-	Where the -r allows you to run the bag faster or slower, and the later half is the path to the bags and the bag file itself.
+7.) cd into the directory containing the bags you wish to run, and run this command in a seperate terminal:
+	source dn[node number]BagPlayer[month]-[day]-[year].sh 
+	^ this will run the bags at the default speed 1x, if you want to make it go faster add a number after the .sh
 
 8.) Repeat step 7 if you want to run another bag (HAS TO BE FROM A DIFFERENT NODE)
 
