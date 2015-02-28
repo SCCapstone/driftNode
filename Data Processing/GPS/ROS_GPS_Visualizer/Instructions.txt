@@ -1,3 +1,18 @@
+---- INSTRUCTIONS TO PLOT GPS DATA FROM DN1 and DN3 ----
+
+1.) Ensure you have the following scripts: duoBagPlay1-16-15.sh, dn1BagPlayer1-16-15.sh, dn3BagPlayer1-16-15.sh
+
+2.) Ensure you have them all in the same directory and that you have two other directories in there titled "dn1" and "dn3" which contain the respective bags.
+
+3.) cd into the directory that contains all the scripts and run this command:
+	source duoBagPlay1-16-15.sh
+
+4.) It will open a new xterm that will launch rosbridge by itself, and ask if rosbridge launched and that you have the website up.
+
+5.) It will then ask what speed you wish to play the bags at. After a time of 480 seconds/speed, dn1 will open a new xterm and start playing its bags.
+
+6.) The script will handle everything else.
+
 ---- INSTRUCTIONS TO PLOT GPS DATA FROM 1 or 2 DRIFT NODES ----
 
 1.) Run this command in 1 terminal:
