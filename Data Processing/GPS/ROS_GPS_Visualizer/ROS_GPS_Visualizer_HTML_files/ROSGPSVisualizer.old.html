@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,32 +15,26 @@
 <script src="js/jquery.mobile-1.3.1.min.js"></script>
 
 <style>
-.ui-collapsible-content 
-{
-	padding: 4px;
+.ui-collapsible-content {
+  padding: 4px;
 }
 
-#map-canvas 
-{
-  	margin: 0;
-  	padding: 0;
-  	width: 100%;
-  	height: 800px;
+#map-canvas {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 600px;
 }
 </style>
 
 <script>
-/* 
-
-Original Author: Anqi Xu, Ph.D. candidate, McGill University
-
-FIXED & EDITED BY: Daniel Boydstun, Undergraduate Senior, University of South Carolina
-
-*/
+//FIXED & EDITED BY: Daniel Boydstun
 
 var map;
 var initPos = new google.maps.LatLng(13.191797, -59.642539);
 var styleArray = [{featureType: "road", stylers: [{ visibility: "off" }]}];
+var infowindow = new google.maps.InfoWindow({
+	content: "" });
 google.maps.visualRefresh = true;
 var ros = new ROSLIB.Ros();
 var connected = false;
@@ -47,16 +42,11 @@ var listenerGPS = null;
 var listenerGPS2 = null;
 var prevGPSMsgTime = new Date();
 var prevGPSMsgTime2 = new Date();
-var originMarker = new google.maps.Marker();
-var originMarker2 = new google.maps.Marker();
+var waypointLines = null;
+var markers = new Array();
+var markers2 = new Array();
 var path = new Array();
 var path2 = new Array();
-var sumOfDistance = 0;
-var sumOfDistance2 = 0;
-var prevGPSPosition = new google.maps.LatLng(0, 0);
-var prevGPSPosition2 = new google.maps.LatLng(0, 0);
-var originTime = 0.0;
-var originTime2 = 0.0;
 
 function initializeMap() 
 {
@@ -90,6 +80,62 @@ function initializeMap()
 	};
   	poly2 = new google.maps.Polyline(poly2Options);
 	poly2.setMap(map);
+
+	google.maps.event.addListener(poly, 'mouseover', function (event) {
+		var lat1 = markers[0].getPosition().lat();
+		var lat2 = event.latLng.lat();
+		var lng1 = markers[0].getPosition().lng();
+		var lng2 = event.latLng.lng();
+
+		var R = 6371000;
+		var phi1 = lat1 * Math.PI/180;
+		var phi2 = lat2 * Math.PI/180;
+		var dPhi = (lat2-lat1) * Math.PI/180;
+		var dLambda = (lng2-lng1) * Math.PI/180;
+
+		var a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
+       		Math.cos(phi1) * Math.cos(phi2) *
+        	Math.sin(dLambda/2) * Math.sin(dLambda/2);
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+		var d = R * c;
+
+		infowindow.setContent("Latitude: "+ lat2 + ";<br>Longitude " + lng2+";<br><br>Cartesian Distance to Origin Point: " + d + " m");
+        	infowindow.setPosition(event.latLng);
+		infowindow.open(map);
+    	}); 
+    
+    	google.maps.event.addListener(poly, 'mouseout', function () {
+        	infowindow.close();
+    	});
+
+	google.maps.event.addListener(poly2, 'mouseover', function (event) {
+		var lat1 = markers2[0].getPosition().lat();
+		var lat2 = event.latLng.lat();
+		var lng1 = markers2[0].getPosition().lng();
+		var lng2 = event.latLng.lng();
+
+		var R = 6371000;
+		var phi1 = lat1 * Math.PI/180;
+		var phi2 = lat2 * Math.PI/180;
+		var dPhi = (lat2-lat1) * Math.PI/180;
+		var dLambda = (lng2-lng1) * Math.PI/180;
+
+		var a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
+       		Math.cos(phi1) * Math.cos(phi2) *
+        	Math.sin(dLambda/2) * Math.sin(dLambda/2);
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+		var d = R * c;
+
+		infowindow.setContent("Latitude: "+ lat2 + ";<br>Longitude " + lng2+";<br><br>Cartesian Distance to Origin Point: " + d + " m");
+        	infowindow.setPosition(event.latLng);
+		infowindow.open(map);
+    	}); 
+    
+    	google.maps.event.addListener(poly2, 'mouseout', function () {
+        	infowindow.close();
+    	});
 }
 
 google.maps.event.addListener(path2, "mouseover", function(event) { alert('mouseover ' + path2.latLng); });
@@ -116,6 +162,16 @@ function callbackGPS(msg)
   	$('#gps_latest_time').val(time.toString());
   
   	console.log('Topic 1: Recv GPS (' + lat.toString() + ',' + lon.toString() + ') @ ' + time.toString());
+
+  	var maxNumMarkers = parseInt($('#gps_max_num_markers').val());
+  	if (maxNumMarkers > 0) 
+	{
+    		while (markers.length >= maxNumMarkers) 
+		{
+      			var removedMarker = markers.shift();
+      			removedMarker.setMap(null);
+    		}
+  	}
   	
 	if( (lat != 0) && (lon != 0) ) // Assuming we are never at (0, 0) this will "catch" the holes in the bags and prevent them from ruining the map.
 	{
@@ -125,57 +181,16 @@ function callbackGPS(msg)
 
 		if(path.length == 1)
 		{
-			originMarker = new google.maps.Marker({
-    				position: new google.maps.LatLng(lat, lon),
-				map: map,
-    				title: "Origin for Topic 1;\nLat = "+lat.toString()+";\nLon = "+lon.toString()+"\nOrigin Time = " + time,
-				draggable: false,
-    				clickable: true,
-    				animation: google.maps.Animation.DROP,
-  			});
-
-			prevGPSPosition = new google.maps.LatLng(lat, lon);
-			originTime = time;
+			markers.push(new google.maps.Marker({
+    			map: map,
+    			draggable: false,
+    			clickable: true,
+    			title: "Origin; Lat = "+lat.toString()+"; Lon = "+lon.toString(),
+    			animation: google.maps.Animation.DROP,
+    			position: new google.maps.LatLng(lat, lon)
+  			}));
 		}
 	}
-
-	//<Distance Stuff>
-	var lat1 = prevGPSPosition.lat();
-	var lat2 = lat;
-	var lng1 = prevGPSPosition.lng();
-	var lng2 = lon;
-
-	var R = 6371000;
-	var phi1 = lat1 * Math.PI/180;
-	var phi2 = lat2 * Math.PI/180;
-	var dPhi = (lat2-lat1) * Math.PI/180;
-	var dLambda = (lng2-lng1) * Math.PI/180;
-
-	var a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
-       		Math.cos(phi1) * Math.cos(phi2) *
-        	Math.sin(dLambda/2) * Math.sin(dLambda/2);
-	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-	var d = R * c;
-	sumOfDistance = sumOfDistance + Math.abs(d);
-	$('#distance_travelled').val(sumOfDistance.toString() + " m");
-	
-	prevGPSPosition = new google.maps.LatLng(lat2, lng2);
-	//</Distance Stuff>
-
-	//<Time Stuff>
-	var timeActive = time - originTime;
-	$('#time_active').val(timeActive.toString() + " s");
-	//</Time Stuff>
-	
-	//<Speed Stuff>
-	var avgSpeed = 0.0;
-	if(timeActive > 0)
-	{
-		avgSpeed = sumOfDistance / timeActive;
-	} 
-	$('#avg_speed').val(avgSpeed.toString() + " m/s");
-	//</Speed Stuff>
 };
 
 function callbackGPS2(msg) 
@@ -194,10 +209,20 @@ function callbackGPS2(msg)
   	var lon2 = msg.longitude;
   	var time2 = msg.header.stamp.secs + msg.header.stamp.nsecs/1e9;
   	var str2 = time2.toString() + ' @ (' + lat2.toString() + ',' + lon2.toString() + ')';
-  	$('#gps_latest_latlon2').val('(' + lat2.toString() + ',' + lon2.toString() + ')');
-  	$('#gps_latest_time2').val(time2.toString());
+  	$('#gps_latest_latlon').val('(' + lat2.toString() + ',' + lon2.toString() + ')');
+  	$('#gps_latest_time').val(time2.toString());
   
   	console.log('Topic 2: Recv GPS (' + lat2.toString() + ',' + lon2.toString() + ') @ ' + time2.toString());
+
+  	var maxNumMarkers2 = parseInt($('#gps_max_num_markers').val());
+  	if (maxNumMarkers2 > 0) 
+	{
+    		while (markers.length >= maxNumMarkers2) 
+		{
+      			var removedMarker2 = markers.shift();
+      			removedMarker2.setMap(null);
+    		}
+  	}
   
 	if( (lat2 != 0) && (lon2 != 0) ) // Assuming we are never at (0, 0) this will "catch" the holes in the bags and prevent them from ruining the map.
 	{
@@ -207,62 +232,20 @@ function callbackGPS2(msg)
 
 		if(path2.length == 1)
 		{
-			originMarker2 = new google.maps.Marker({
-    				position: new google.maps.LatLng(lat2, lon2),
-				map: map,
-    				title: "Origin for Topic 2;\nLat = "+lat2.toString()+";\nLon = "+lon2.toString()+"\nOrigin Time = " + time2,
-				draggable: false,
-    				clickable: true,
-    				animation: google.maps.Animation.DROP
-  			});
-
-			prevGPSPosition2 = new google.maps.LatLng(lat2, lon2);
-			originTime2 = time2;
+			markers2.push(new google.maps.Marker({
+    			map: map,
+    			draggable: false,
+    			clickable: true,
+    			title: "Origin; Lat = "+lat2.toString()+"; Lon = "+lon2.toString(),
+    			animation: google.maps.Animation.DROP,
+    			position: new google.maps.LatLng(lat2, lon2)
+  			}));
 		}
 	}
-
-	//<Distance Stuff>
-	var lat1 = prevGPSPosition2.lat();
-	var lat2 = lat2;
-	var lng1 = prevGPSPosition2.lng();
-	var lng2 = lon2;
-
-	var R = 6371000;
-	var phi1 = lat1 * Math.PI/180;
-	var phi2 = lat2 * Math.PI/180;
-	var dPhi = (lat2-lat1) * Math.PI/180;
-	var dLambda = (lng2-lng1) * Math.PI/180;
-
-	var a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
-       		Math.cos(phi1) * Math.cos(phi2) *
-        	Math.sin(dLambda/2) * Math.sin(dLambda/2);
-	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-	var d = R * c;
-	sumOfDistance2 = sumOfDistance2 + Math.abs(d);
-	$('#distance_travelled2').val(sumOfDistance2.toString() + " m");
-	
-	prevGPSPosition2 = new google.maps.LatLng(lat2, lng2);
-	//</Distance Stuff>
-
-	//<Time Stuff>
-	var timeActive2 = time2 - originTime2;
-	$('#time_active2').val(timeActive2.toString() + " s");
-	//</Time Stuff>
-	
-	//<Speed Stuff>
-	var avgSpeed2 = 0.0;
-	if(timeActive2 > 0)
-	{
-		avgSpeed2 = sumOfDistance2 / timeActive2;
-	} 
-	$('#avg_speed2').val(avgSpeed2.toString() + " m/s");
-	//</Speed Stuff>
 };
 
 function clearWaypoints() 
 {
-	//DOES NOT WORK DO NOT TRY TO PUSH
   	while (markers.length > 0) 
 	{
     		var removedMarker = markers.pop();
@@ -278,17 +261,14 @@ function clearWaypoints()
 };
 
 
-$(function() 
-{
-  	$('form').submit(false);
+$(function() {
+  $('form').submit(false);
   
-  	$('#gps_clear_markers').click(function() 
-	{
-    		//clearWaypoints();
-		alert("This does nothing. Don't press me again.");
-  	});
+  $('#gps_clear_markers').click(function() {
+    clearWaypoints();
+  });
   
-  	// TODO: disable blue glow on "Clear Markers" button
+  // TODO: disable blue glow on "Clear Markers" button
 });
 
 
@@ -399,91 +379,15 @@ function toggleConnection()
 
 <div id="map-canvas"></div>
 
-<div class="ui-grid-a">
+<div class="ui-grid-b">
 <div class="ui-block-a">
-  | --------- Topic 1 Data --------- |
-</div>
-</div>
-
-<div class="ui-grid-d">
-<div class="ui-block-a">
-  Latest GPS Coordinates:
+  Latest GPS Msg:
 </div>
 <div class="ui-block-b">
-  Latest GPS Time:
-</div>
-<div class="ui-block-c">
-  Distance Travelled:
-</div>
-<div class="ui-block-d">
-  Time Active:
-</div>
-<div class="ui-block-e">
-  Avg. Speed:
-</div>
-</div>
-</div>
-
-<div class="ui-grid-d">
-<div class="ui-block-a">
   <input type="text" data-mini="true" readonly name="gps_latest_latlon" id="gps_latest_latlon" value="">
 </div>
-<div class="ui-block-b">
+<div class="ui-block-c">
   <input type="text" data-mini="true" readonly name="gps_latest_time" id="gps_latest_time" value="">
-</div>
-<div class="ui-block-c">
-  <input type="text" data-mini="true" readonly name="distance_travelled" id="distance_travelled" value="0 m">
-</div>
-<div class="ui-block-d">
-  <input type="text" data-mini="true" readonly name="time_active" id="time_active" value="0 s">
-</div>
-<div class="ui-block-e">
-  <input type="text" data-mini="true" readonly name="avg_speed" id="avg_speed" value="0 m/s">
-</div>
-</div>
-</div>
-
-<div class="ui-grid-a">
-<div class="ui-block-a">
-  | --------- Topic 2 Data --------- |
-</div>
-</div>
-
-<div class="ui-grid-d">
-<div class="ui-block-a">
-  Latest GPS Coordinates:
-</div>
-<div class="ui-block-b">
-  Latest GPS Time:
-</div>
-<div class="ui-block-c">
-  Distance Travelled:
-</div>
-<div class="ui-block-d">
-  Time Active:
-</div>
-<div class="ui-block-e">
-  Avg. Speed:
-</div>
-</div>
-</div>
-
-<div class="ui-grid-d">
-<div class="ui-block-a">
-  <input type="text" data-mini="true" readonly name="gps_latest_latlon2" id="gps_latest_latlon2" value="">
-</div>
-<div class="ui-block-b">
-  <input type="text" data-mini="true" readonly name="gps_latest_time2" id="gps_latest_time2" value="">
-</div>
-<div class="ui-block-c">
-  <input type="text" data-mini="true" readonly name="distance_travelled2" id="distance_travelled2" value="0 m">
-</div>
-<div class="ui-block-d">
-  <input type="text" data-mini="true" readonly name="time_active2" id="time_active2" value="0 s">
-</div>
-<div class="ui-block-e">
-  <input type="text" data-mini="true" readonly name="avg_speed2" id="avg_speed2" value="0 m/s">
-</div>
 </div>
 </div>
 

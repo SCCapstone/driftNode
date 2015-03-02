@@ -10,7 +10,7 @@ speed=1
 xterm -e roslaunch rosbridge_server rosbridge_websocket.launch &
 pid=$!
 
-echo -n "Once rosbridge is running, and you have the website ready enter \"y\" to continue: "
+echo -n "Once rosbridge is running, open the website and toggle the connection. Are you ready to continue? [y/n] "
 
 while [ "$answer" != "y"  -a "$answer" != "Y" ]
 do
