@@ -37,6 +37,8 @@ FIXED & EDITED BY: Daniel Boydstun, Undergraduate Senior, University of South Ca
 
 */
 
+const R = 6371000;
+
 var map;
 var initPos = new google.maps.LatLng(13.191797, -59.642539);
 var styleArray = [{featureType: "road", stylers: [{ visibility: "off" }]}];
@@ -57,6 +59,8 @@ var prevGPSPosition = new google.maps.LatLng(0, 0);
 var prevGPSPosition2 = new google.maps.LatLng(0, 0);
 var originTime = 0.0;
 var originTime2 = 0.0;
+var polyOptions = {strokeColor: "#FFFF00", strokeOpacity: 0.8, strokeWeight: 3};
+var poly2Options = {strokeColor: "#00FF1E", strokeOpacity: 0.8, strokeWeight: 3};
 
 function initializeMap() 
 {
@@ -73,21 +77,9 @@ function initializeMap()
   	};
   	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
-	var polyOptions = 
-	{
-		strokeColor: "#FFFF00",
-    		strokeOpacity: 0.8,
-    		strokeWeight: 3
-	};
   	poly = new google.maps.Polyline(polyOptions);
 	poly.setMap(map);
 
-	var poly2Options = 
-	{
-		strokeColor: "#00FF1E",
-    		strokeOpacity: 0.8,
-    		strokeWeight: 3
-	};
   	poly2 = new google.maps.Polyline(poly2Options);
 	poly2.setMap(map);
 }
@@ -109,7 +101,6 @@ function callbackGPS(msg)
   	var lat = msg.latitude;
   	var lon = msg.longitude;
   	var time = msg.header.stamp.secs + msg.header.stamp.nsecs/1e9;
-  	var str = time.toString() + ' @ (' + lat.toString() + ',' + lon.toString() + ')';
   	$('#gps_latest_latlon').val('(' + lat.toString() + ',' + lon.toString() + ')');
   	$('#gps_latest_time').val(time.toString());
   
@@ -117,6 +108,16 @@ function callbackGPS(msg)
   	
 	if( (lat != 0) && (lon != 0) ) // Assuming we are never at (0, 0) this will "catch" the holes in the bags and prevent them from ruining the map.
 	{
+		if(poly.getMap() == null)
+		{
+			poly.setMap(map);
+		}
+
+		if( (originMarker.getPosition() == null) && (originMarker2.getPosition() == null) )
+		{
+			map.setCenter(new google.maps.LatLng(lat, lon));
+		}
+
   		path = poly.getPath();
 
   		path.push(new google.maps.LatLng(lat, lon));
@@ -126,7 +127,7 @@ function callbackGPS(msg)
 			originMarker = new google.maps.Marker({
     				position: new google.maps.LatLng(lat, lon),
 				map: map,
-    				title: "Origin for Topic 1;\nLat = "+lat.toString()+";\nLon = "+lon.toString()+"\nOrigin Time = " + time,
+    				title: "Origin for "+ document.getElementById("gps_topic").value +";\nLat = "+lat.toString()+";\nLon = "+lon.toString()+"\nOrigin Time = " + time,
 				draggable: false,
     				clickable: true,
     				animation: google.maps.Animation.DROP,
@@ -138,27 +139,9 @@ function callbackGPS(msg)
 	}
 
 	//<Distance Stuff>
-	var lat1 = prevGPSPosition.lat();
-	var lat2 = lat;
-	var lng1 = prevGPSPosition.lng();
-	var lng2 = lon;
-
-	var R = 6371000;
-	var phi1 = lat1 * Math.PI/180;
-	var phi2 = lat2 * Math.PI/180;
-	var dPhi = (lat2-lat1) * Math.PI/180;
-	var dLambda = (lng2-lng1) * Math.PI/180;
-
-	var a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
-       		Math.cos(phi1) * Math.cos(phi2) *
-        	Math.sin(dLambda/2) * Math.sin(dLambda/2);
-	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-	var d = R * c;
-	sumOfDistance = sumOfDistance + Math.abs(d);
+	sumOfDistance = sumOfDistance + calculateDistance(prevGPSPosition.lat(), lat, prevGPSPosition.lng(), lon);
 	$('#distance_travelled').val(sumOfDistance.toString() + " m");
-	
-	prevGPSPosition = new google.maps.LatLng(lat2, lng2);
+	prevGPSPosition = new google.maps.LatLng(lat, lon);
 	//</Distance Stuff>
 
 	//<Time Stuff>
@@ -191,7 +174,6 @@ function callbackGPS2(msg)
   	var lat2 = msg.latitude;
   	var lon2 = msg.longitude;
   	var time2 = msg.header.stamp.secs + msg.header.stamp.nsecs/1e9;
-  	var str2 = time2.toString() + ' @ (' + lat2.toString() + ',' + lon2.toString() + ')';
   	$('#gps_latest_latlon2').val('(' + lat2.toString() + ',' + lon2.toString() + ')');
   	$('#gps_latest_time2').val(time2.toString());
   
@@ -199,6 +181,16 @@ function callbackGPS2(msg)
   
 	if( (lat2 != 0) && (lon2 != 0) ) // Assuming we are never at (0, 0) this will "catch" the holes in the bags and prevent them from ruining the map.
 	{
+		if(poly2.getMap() == null)
+		{
+			poly2.setMap(map);
+		}
+
+		if( (originMarker.getPosition() == null) && (originMarker2.getPosition() == null) )
+		{
+			map.setCenter(new google.maps.LatLng(lat2, lon2));
+		}
+
   		path2 = poly2.getPath();
 
   		path2.push(new google.maps.LatLng(lat2, lon2));
@@ -208,7 +200,7 @@ function callbackGPS2(msg)
 			originMarker2 = new google.maps.Marker({
     				position: new google.maps.LatLng(lat2, lon2),
 				map: map,
-    				title: "Origin for Topic 2;\nLat = "+lat2.toString()+";\nLon = "+lon2.toString()+"\nOrigin Time = " + time2,
+    				title: "Origin for "+ document.getElementById("gps_topic2").value +";\nLat = "+lat2.toString()+";\nLon = "+lon2.toString()+"\nOrigin Time = " + time2,
 				draggable: false,
     				clickable: true,
     				animation: google.maps.Animation.DROP
@@ -220,27 +212,9 @@ function callbackGPS2(msg)
 	}
 
 	//<Distance Stuff>
-	var lat1 = prevGPSPosition2.lat();
-	var lat2 = lat2;
-	var lng1 = prevGPSPosition2.lng();
-	var lng2 = lon2;
-
-	var R = 6371000;
-	var phi1 = lat1 * Math.PI/180;
-	var phi2 = lat2 * Math.PI/180;
-	var dPhi = (lat2-lat1) * Math.PI/180;
-	var dLambda = (lng2-lng1) * Math.PI/180;
-
-	var a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
-       		Math.cos(phi1) * Math.cos(phi2) *
-        	Math.sin(dLambda/2) * Math.sin(dLambda/2);
-	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-	var d = R * c;
-	sumOfDistance2 = sumOfDistance2 + Math.abs(d);
+	sumOfDistance2 = sumOfDistance2 + calculateDistance(prevGPSPosition2.lat(), lat2, prevGPSPosition2.lng(), lon2);
 	$('#distance_travelled2').val(sumOfDistance2.toString() + " m");
-	
-	prevGPSPosition2 = new google.maps.LatLng(lat2, lng2);
+	prevGPSPosition2 = new google.maps.LatLng(lat2, lon2);
 	//</Distance Stuff>
 
 	//<Time Stuff>
@@ -258,21 +232,53 @@ function callbackGPS2(msg)
 	//</Speed Stuff>
 };
 
+function calculateDistance(lat1, lat2, lng1, lng2)
+{
+	var phi1 = lat1 * Math.PI/180;
+	var phi2 = lat2 * Math.PI/180;
+	var dPhi = (lat2-lat1) * Math.PI/180;
+	var dLambda = (lng2-lng1) * Math.PI/180;
+
+	var a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
+       		Math.cos(phi1) * Math.cos(phi2) *
+        	Math.sin(dLambda/2) * Math.sin(dLambda/2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+	var d = R * c;
+
+	return Math.abs(d);
+};
+
 function clearWaypoints() 
 {
-	//DOES NOT WORK DO NOT TRY TO PUSH
-  	while (markers.length > 0) 
-	{
-    		var removedMarker = markers.pop();
-    		removedMarker.setMap(null);
-  	}
+	originMarker.setMap(null);
+	originMarker2.setMap(null);
 
-	while (markers2.length > 0) 
-	{
-    		var removedMarker = markers2.pop();
-    		removedMarker.setMap(null);
-  	}
-  	$('#gps_clear_markers').parent().removeClass('ui-btn-active');
+	poly = new google.maps.Polyline(polyOptions);
+	poly.setMap(null);
+
+	poly2 = new google.maps.Polyline(poly2Options);
+	poly2.setMap(null);
+
+	path.clear();
+	path2.clear();
+
+	sumOfDistance = 0;
+	sumOfDistance2 = 0;
+	originTime = 0.0;
+	originTime2 = 0.0;
+
+	$('#gps_latest_latlon').val("");
+  	$('#gps_latest_time').val("");
+	$('#distance_travelled').val("0 m");
+	$('#time_active').val("0 s");
+	$('#avg_speed').val("0 m/s");
+
+	$('#gps_latest_latlon2').val("");
+  	$('#gps_latest_time2').val("");
+	$('#distance_travelled2').val("0 m");
+	$('#time_active2').val("0 s");
+	$('#avg_speed2').val("0 m/s");
 };
 
 
@@ -282,11 +288,11 @@ $(function()
   
   	$('#gps_clear_markers').click(function() 
 	{
-    		//clearWaypoints();
-		alert("This does nothing. Don't press me again.");
+    		clearWaypoints();
   	});
-  
+
   	// TODO: disable blue glow on "Clear Markers" button
+	// I cannot get this to work either!
 });
 
 
@@ -327,20 +333,31 @@ function toggleConnection()
     		}
 
     		ros.connect('ws://' + addr);
-    		connected = true;
-    		listenerGPS = new ROSLIB.Topic({
-      			ros : ros,
-      			name : topic,
-      			messageType : 'sensor_msgs/NavSatFix'
-    		});
-    		listenerGPS.subscribe(callbackGPS);
+		
+		ros.on('error', function(error) 
+		{
+			alert("WebSocket connection to \'ws://"+addr+"/\' failed: Error in connection establishment.\n\n1.) Check to see the information in the address box is correct.\n\n2.) Check to make sure that rosbridge has launched successfully, and that the ports match.\n\n3.) Check to see if the connection has been refused.");
+			document.getElementById("gps_connect").value = '0';
+			$('select').slider('refresh');
+		});		
 
-		listenerGPS2 = new ROSLIB.Topic({
-      			ros : ros,
-      			name : topic2,
-      			messageType : 'sensor_msgs/NavSatFix'
-    		});
-    		listenerGPS2.subscribe(callbackGPS2);
+		ros.on('connection', function() 
+		{
+			connected = true;
+    			listenerGPS = new ROSLIB.Topic({
+      				ros : ros,
+      				name : topic,
+      				messageType : 'sensor_msgs/NavSatFix'
+    			});
+    			listenerGPS.subscribe(callbackGPS);
+
+			listenerGPS2 = new ROSLIB.Topic({
+      				ros : ros,
+      				name : topic2,
+      				messageType : 'sensor_msgs/NavSatFix'
+    			});
+    			listenerGPS2.subscribe(callbackGPS2);
+		});
   	}
 };
 </script>
@@ -389,7 +406,7 @@ function toggleConnection()
   </div>
 
   <div data-role="fieldcontain">
-  <button data-inline="true" data-mini="true" id="gps_clear_markers">Clear Markers</button>
+  <button data-inline="true" data-mini="true" id="gps_clear_markers">Clear Map & Data</button>
   </div>
 </div>
 </div>
@@ -487,4 +504,4 @@ function toggleConnection()
 
 </body>
 
-</html> 
+</html>
