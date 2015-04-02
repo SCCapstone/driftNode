@@ -1,0 +1,22 @@
+-install raspbian
+	be sure to enable rpi camera and i2c
+-install ros (rpi ros tutorials)
+
+-create catkin workspace
+	refer to ros tutorials
+	mkdir -p ~/catkin_ws/src
+	cd ~/catkin_ws/src
+	catkin_init_workspace
+	cd ..
+	catkin_make
+	
+-install gpsd
+	sudo apt-get install gpsd gpsd-clients
+	
+-install minimu9-ahrs	see: https://github.com/DavidEGrayson/minimu9-ahrs/wiki
+	wget http://www.davidegrayson.com/minimu9-ahrs/debian/minimu9-ahrs_VERSION_armhf.deb
+	dpkg -i minimu9-ahrs_VERSION_armhf.deb
+	enable i2c on rpi
+	
+-install opencv
+	
