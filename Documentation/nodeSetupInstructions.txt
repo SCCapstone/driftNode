@@ -1,6 +1,7 @@
 -install raspbian
 	-be sure to enable rpi camera and i2c in rpi options menu when prompted
--install ros (rpi ros tutorials): http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Indigo%20on%20Raspberry%20Pi
+	
+-install ROS Indigo (rpi ros tutorials): http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Indigo%20on%20Raspberry%20Pi
 
 -install gpsd
 	-sudo apt-get install gpsd gpsd-clients
