@@ -1,5 +1,0 @@
-http://wiki.ros.org/rosbag/Tutorials/Exporting%20image%20and%20video%20data
-
-http://wiki.ros.org/image_view
-
-https://github.com/fpasteau/raspicam_node
