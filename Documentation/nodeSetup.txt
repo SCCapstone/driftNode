@@ -9,8 +9,20 @@
 	-wget http://www.davidegrayson.com/minimu9-ahrs/debian/minimu9-ahrs_VERSION_armhf.deb
 	-dpkg -i minimu9-ahrs_VERSION_armhf.deb
 	
--install sensor_msgs and nav_msgs ros packages
+-install common_msgs ros package
 	-needed for imu, gps, and wifi nodes  
 
--install opencv
+-for raspicam node
+	-image_common & image_transport_plugins ros package
+	-install libyaml-cpp0.3 & libyaml-cpp-dev from aptitude
+	-pluginlib & class_loader ros package
+	-install libpoco-dev from aptitude
+	-install libopencv-dev from aptitude
+	-vision_opencv, dynamic reconfigure, and geometry ros packages
+	-libeigen3-dev from aptitude
+	-orocos_kdl  (system) see: http://wiki.ros.org/orocos_kdl
+	-angles ros package
+	-tf2_ros (part of geometry_experimental) ros package
+	-actionlib ros package
+	-install libtheora-dev from aptitude
 	
