@@ -8,6 +8,7 @@
 -install minimu9-ahrs	see: https://github.com/DavidEGrayson/minimu9-ahrs/wiki
 	-wget http://www.davidegrayson.com/minimu9-ahrs/debian/minimu9-ahrs_VERSION_armhf.deb
 	-dpkg -i minimu9-ahrs_VERSION_armhf.deb
+	-add i2c modules to /etc/modules as mentioned in above wiki
 	
 -install common_msgs ros package
 	-needed for imu, gps, and wifi nodes  
@@ -26,3 +27,11 @@
 	-actionlib ros package
 	-install libtheora-dev from aptitude
 	
+-miscellaneous scripts/files
+	-replace .profile in ~/ with the .profile from the driftNode repo
+	-replace inittab in /etc with the inittab from the driftNode repo
+	-replace rc.local in /etc with the rc.local from the driftNode repo
+	-place driftNodeStartupROS.sh and gpsdStart.sh in /etc/init.d
+		-be sure to make both executable
+	-place GPIOLEDoff.py, GPIOLEDon.py, and GPSreader.py scripts into ~/deps 
+		-will need to make ~/deps directory

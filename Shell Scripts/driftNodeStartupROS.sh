@@ -3,7 +3,7 @@
 echo "driftNode starting up"
 
 #making sure GPS fix led is off before starting
-sudo python /home/pi/Desktop/GPIOLEDoff.py
+sudo python /home/pi/deps/GPIOLEDoff.py
 
 #setting node name
 export ROS_NAMESPACE=dn2	#this is to prefix topics with the node id
@@ -22,12 +22,12 @@ sleep 5
 #starting the GPS reader that will wait until the GPS gets a fix before starting everything else
 echo "starting the GPS reader. Once it gets a fix green led will illuminate and ROS will start"
 #the program that will wait until the GPS has a fix before exiting
-python /home/pi/Desktop/GPSreader.py > GPSstartLog.txt
+python /home/pi/deps/GPSreader.py > GPSstartLog.txt
 
 #waits until the GPS reader exits so we know the GPS has a fix
 wait $!
 
-sudo python /home/pi/Desktop/GPIOLEDon.py
+sudo python /home/pi/deps/GPIOLEDon.py
 
 #Starts driftNode ROS Stuff
 
