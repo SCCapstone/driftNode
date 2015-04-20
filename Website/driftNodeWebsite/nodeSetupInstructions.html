@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<!--
+	Read Only by HTML5 UP
+	html5up.net | @n33co
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>driftNode, the Aquatic Current Sensor</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery.scrollzer.min.js"></script>
+		<script src="js/jquery.scrolly.min.js"></script>
+		<script src="js/skel.min.js"></script>
+		<script src="js/skel-layers.min.js"></script>
+		<script src="js/init.js"></script>
+		<noscript>
+			<link rel="stylesheet" href="css/skel.css" />
+			<link rel="stylesheet" href="css/style.css" />
+			<link rel="stylesheet" href="css/style-xlarge.css" />
+		</noscript>
+		<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+	</head>
+	<body>
+		<div id="wrapper">
+
+			<!-- Header -->
+				<section id="header" class="skel-layers-fixed">
+					<header>
+						<span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+						<h1 id="logo"><a href="#">driftNode</a></h1>
+						<p>Capstone Design Project sponsored by<br />
+						the University of South Carolina College of Engineering and Computing</p>
+					</header>
+					<nav id="nav">
+						<ul>
+							<li><a href="index.html" class="active">Home</a></li>
+
+						</ul>
+					</nav>
+					
+				</section>
+
+			<!-- Main -->
+				<div id="main">
+
+					<!-- One -->
+						<section id="one">
+							<div class="container">
+								<header class="major">
+									<h2>Project driftNode</h2>
+									<h3>Setting Up a Node</h3>
+									<p>Instructions for the Software Setup</p>
+								</header>
+								<hr/>
+								<p>
+								<ul></ul>
+								Install raspbian
+									<ul>
+										<li>Be sure to enable rpi camera and i2c in rpi options menu when prompted!</li>
+									</ul>
+								Install ROS Indigo
+									<ul>
+										<li><a href="http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Indigo%20on%20Raspberry%20Pi"> ROS Indigo Tutorials</a></li>
+									</ul>
+								Install minimu9-ahrs
+									<ul>
+										<li><a href="https://github.com/DavidEGrayson/minimu9-ahrs/wiki"> Github Instructions</a></li>
+										<li>wget http://www.davidegrayson.com/minimu9-ahrs/debian/minimu9-ahrs_VERSION_armhf.deb</li>
+										<li>dpkg -i minimu9-ahrs_VERSION_armhf.deb</li>
+										<li>add i2c modules to /etc/modules as mentioned in above wiki</li>
+									</ul>
+								Install common_msgs ROS package
+									<ul>
+										<li>needed for imu, gps, and wifi nodes </li>
+									</ul>
+								Raspicam Node
+									<ul>
+										<li>image_common & image_transport_plugins ros package</li>
+										<li>install libyaml-cpp0.3 & libyaml-cpp-dev from aptitude</li>
+										<li>pluginlib & class_loader ros package</li>
+										<li>install libpoco-dev from aptitude</li>
+										<li>install libopencv-dev from aptitude</li>
+										<li>vision_opencv, dynamic reconfigure, and geometry ros packages</li>
+										<li>libeigen3-dev from aptitude</li>
+										<li>orocos_kdl  (system) see: <a href="http://wiki.ros.org/orocos_kdl">orocos_kdl</a></li>
+										<li>angles ros package</li>
+										<li>tf2_ros (part of geometry_experimental) ros package</li>
+										<li>actionlib ros package</li>
+										<li>install libtheora-dev from aptitude</li>	
+									</ul>
+								Smaller steps
+									<ul>
+										<li>replace .profile in ~/ with the .profile from the driftNode repo</li>
+										<li>replace inittab in /etc with the inittab from the driftNode repo</li>
+										<li>replace rc.local in /etc with the rc.local from the driftNode repo</li>
+										<li>place driftNodeStartupROS.sh and gpsdStart.sh in /etc/init.d<br/>
+										be sure to make both executable</li>
+										<li>place GPIOLEDoff.py, GPIOLEDon.py, and GPSreader.py scripts into ~/deps <br/>
+										will need to make ~/deps directory</li></ul>
+									</ul>
+								</p>
+							</div>
+						</section>
+
+					
+
+			<!-- Footer -->
+				<section id="footer">
+					<div class="container">
+						<ul class="copyright">
+							<li>&copy; This is where our copyrights go. All rights reserved.</li>
+							<li>Site created by: John McCarthy</li>
+							<li>Template by: <a href="http://html5up.net">HTML5Up</li>
+						</ul>
+					</div>
+				</section>
+
+		</div>
+	</body>
+</html>
