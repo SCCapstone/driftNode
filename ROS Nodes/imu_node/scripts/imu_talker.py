@@ -56,6 +56,8 @@ def imu_talker():
 		imu_msg.linear_acceleration.z = raw_vals[5]
 
 		imu_msg.header.seq = seq
+		prefix = "imu_"
+		imu_msg.header.frame_id = prefix
 		time = rospy.get_rostime()
 		imu_msg.header.stamp.secs = time.secs	#time in seconds
 		imu_msg.header.stamp.nsecs = time.nsecs #time in nanoseconds
@@ -77,6 +79,9 @@ def imu_talker():
 		imu_msg.linear_acceleration.x = 0
 		imu_msg.linear_acceleration.y = 0
 		imu_msg.linear_acceleration.z = 0
+		
+		prefix = "imu_"
+		imu_msg.header.frame_id = prefix
 
 		imu_pub.publish(imu_msg)
 
